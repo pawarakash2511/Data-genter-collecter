@@ -1,0 +1,171 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Prevent iOS font size inflation on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: #e3f2fd;
+  color: #000;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height — fixes iOS Safari address bar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Respect iPhone notch / Dynamic Island safe areas */
+  padding: calc(20px + env(safe-area-inset-top))
+           calc(16px + env(safe-area-inset-right))
+           calc(20px + env(safe-area-inset-bottom))
+           calc(16px + env(safe-area-inset-left));
+}
+
+.container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 1.5rem;
+  color: #1565c0;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+input,
+select {
+  width: 100%;
+  /* 16px minimum prevents iOS auto-zoom on focus */
+  font-size: 16px;
+  padding: 12px;
+  border: 1px solid #90caf9;
+  border-radius: 4px;
+  color: #000;
+  background: #f9f9f9;
+  transition: border-color 0.2s;
+  /* Remove default iOS styling so our styles apply consistently */
+  -webkit-appearance: none;
+  appearance: none;
+  /* Minimum 44px touch target (Apple HIG / Material) */
+  min-height: 44px;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231976d2' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #1976d2;
+  background: #fff;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  min-height: 48px; /* accessible touch target */
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+  /* Remove 300 ms tap delay on mobile */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button[type="submit"]:hover,
+button[type="submit"]:active {
+  background-color: #1565c0;
+}
+
+#message {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.95rem;
+  display: none;
+  /* Wrap long words on small screens */
+  word-break: break-word;
+}
+
+#message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+#message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+/* ── Tablet (≤768px) ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container {
+    padding: 32px 24px;
+  }
+}
+
+/* ── Large phones / small tablets (≤520px) ───────────────── */
+@media (max-width: 520px) {
+  .container {
+    padding: 24px 16px;
+    border-radius: 6px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+}
+
+/* ── Small phones — iPhone SE, Galaxy A series (≤375px) ──── */
+@media (max-width: 375px) {
+  body {
+    align-items: flex-start;
+    padding-top: calc(16px + env(safe-area-inset-top));
+  }
+
+  .container {
+    padding: 20px 12px;
+  }
+
+  h1 {
+    font-size: 1.1rem;
+  }
+}
