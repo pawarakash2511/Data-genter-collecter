@@ -2,7 +2,7 @@ name: CD — Deploy to AWS EC2
 
 on:
   workflow_run:
-    workflows: ["CI — Build & Push Docker Images"]
+    workflows: ["CI — Test, Build & Push Docker Images"]
     types:
       - completed
 
@@ -13,9 +13,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -23,7 +20,14 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.EC2_USER }}/Data-genter-collecter
+            set -e
+            cd /home/ec2-user/Data-genter-collecter
+
+            # Pull latest code (docker-compose.yml etc.)
+            git pull origin main
+
+            # Write .env from GitHub Secret (idempotent — safe to run every deploy)
+            echo "${{ secrets.ENV_FILE }}" > .env
 
             # Pull latest images from Docker Hub
             docker pull pawarakash2511/customer-api:latest

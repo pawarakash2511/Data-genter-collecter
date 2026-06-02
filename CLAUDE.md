@@ -45,10 +45,11 @@ docker push pawarakash2511/customer-ui:v1
 ## Architecture
 
 ```
-frontend/ (port 80)  →  backend/ (port 5000)  →  mysql (port 3306)
+Browser → frontend/:80 (Nginx) → /api/* proxied → backend/:5000 (Flask) → mysql:3306
 ```
 
-- **`frontend/script.js`** — multiplies `some_number × 2` before POSTing to `/api/customers`
+- **`frontend/nginx.conf`** — proxies `/api/` to `http://backend:5000/api/` internally; backend port 5000 is NOT exposed to the host
+- **`frontend/script.js`** — multiplies `some_number × 2` before POSTing to `/api/customers` (relative URL, works in both dev and production)
 - **`backend/app.py`** — increments `age + 1`, generates `submitted_at`, calls `insert_customer()`
 - **`backend/database.py`** — MySQL connection via env vars (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`)
 - **`backend/models.py`** — `insert_customer(data)` executes the INSERT
@@ -103,3 +104,4 @@ Frontend works on desktop, Android, and iPhone. Key techniques in `frontend/styl
 - `EC2_HOST` = EC2 public IP
 - `EC2_USER` = `ec2-user`
 - `EC2_SSH_KEY` = PEM private key content
+- `ENV_FILE` = full contents of `.env` file (CD writes this to EC2 on every deploy)

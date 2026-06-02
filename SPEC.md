@@ -408,3 +408,4 @@ GitHub Actions
 | `EC2_HOST` | EC2 public IP or hostname |
 | `EC2_USER` | `ec2-user` (Amazon Linux) |
 | `EC2_SSH_KEY` | Private SSH key (PEM content) |
+

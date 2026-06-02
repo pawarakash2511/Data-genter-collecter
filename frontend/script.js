@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/customers";
+// Relative URL — Nginx proxies /api/ to the backend container internally.
+// This works on both localhost (dev) and the EC2 server (production).
+const API_URL = "/api/customers";
 
 document.getElementById("customerForm").addEventListener("submit", async (e) => {
   e.preventDefault();

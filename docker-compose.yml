@@ -22,7 +22,7 @@ services:
 
   backend:
     build: ./backend
-    image: pawarakash2511/customer-api:v1
+    image: pawarakash2511/customer-api:latest
     container_name: backend
     restart: always
     env_file: .env
@@ -31,8 +31,7 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    ports:
-      - "5000:5000"
+    # Port 5000 is NOT exposed to the host — only reachable via Nginx inside the Docker network
     depends_on:
       mysql:
         condition: service_healthy
@@ -41,7 +40,7 @@ services:
 
   frontend:
     build: ./frontend
-    image: pawarakash2511/customer-ui:v1
+    image: pawarakash2511/customer-ui:latest
     container_name: frontend
     restart: always
     ports:
