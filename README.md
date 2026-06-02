@@ -1,80 +1,53 @@
 # Customer Data Collection
 
-Full-stack web app — HTML/CSS/JS frontend, Python Flask backend, MySQL database — all containerized with Docker Compose.
+Full-stack web app — HTML/CSS/JS frontend, Python Flask backend, MySQL database — containerized with Docker Compose and deployed to AWS EC2 via GitHub Actions.
+
+> Full documentation: see **[docs.md](docs.md)**
 
 ## Business Logic
 
 | Rule | Location |
 |---|---|
-| `some_number × 2` | `frontend/script.js` (before POST) |
-| `age + 1` | `backend/app.py` (after receiving) |
-| Submission timestamp | `backend/app.py` (UTC, at insert time) |
+| `some_number × 2` | `frontend/script.js` — before POST |
+| `age + 1` | `backend/app.py` — after receiving |
+| `submitted_at` | `backend/app.py` — UTC timestamp at insert |
 
-## Local Development
+## Quick Start (Local)
 
 ```bash
-cp .env.example .env        # set credentials
-docker-compose up --build   # starts frontend:80, backend:5000, mysql:3306
+cp .env.example .env
+docker-compose up --build
+# Open http://localhost:8082
 ```
 
-Open http://localhost to use the form.
+## Run Tests
 
-**Verify data in MySQL:**
 ```bash
-docker exec -it mysql mysql -u root -prootpassword customerdb -e "SELECT * FROM customers;"
+cd backend && pytest tests/ -v
 ```
+
+## CI/CD
+
+| Workflow | Trigger |
+|---|---|
+| CI — test + build + push to Docker Hub | Manual (Actions tab → Run workflow) |
+| CD — deploy to EC2 | Auto when CI succeeds |
 
 ## Docker Hub
 
 ```bash
-# Build
-docker-compose build
-
-# Tag & push
-docker tag pawarakash2511/customer-api:v1 pawarakash2511/customer-api:v1
-docker push pawarakash2511/customer-api:v1
-
-docker tag pawarakash2511/customer-ui:v1 pawarakash2511/customer-ui:v1
-docker push pawarakash2511/customer-ui:v1
+docker push pawarakash2511/customer-api:latest
+docker push pawarakash2511/customer-ui:latest
 ```
 
-## AWS EC2 Deployment (Amazon Linux 2)
+## Verify DB on EC2
 
 ```bash
-sudo yum update -y
-sudo yum install docker -y
-sudo service docker start
-sudo usermod -aG docker ec2-user
-
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
-  -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Clone and run
-git clone <repo-url>
-cd Data-genter-collecter
-cp .env.example .env        # fill in credentials
-docker-compose up -d
+docker exec -it mysql mysql -u root -pYOUR_PASSWORD customerdb -e "SELECT * FROM customers;"
 ```
 
-Open http://<ec2-public-ip> in a browser.
+## Live App
 
-## API
-
-**POST /api/customers**
-
-```json
-{
-  "customer_id": "CUST001",
-  "customer_name": "John Doe",
-  "gender": "Male",
-  "age": 25,
-  "some_number": 20
-}
 ```
-
-Response:
-```json
-{ "status": "success", "message": "Customer data saved successfully" }
+http://<EC2-PUBLIC-IP>:8082
 ```
