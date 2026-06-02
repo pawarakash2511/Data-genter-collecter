@@ -23,18 +23,51 @@ jobs:
             set -e
             cd /home/ec2-user/Data-genter-collecter
 
-            # Pull latest code (docker-compose.yml etc.)
+            # Pull latest code (picks up docker-compose.yml changes)
             git pull origin main
 
-            # Write .env from GitHub Secret (idempotent — safe to run every deploy)
-            echo "${{ secrets.ENV_FILE }}" > .env
+            # Auto-generate .env from secrets — no manual file creation needed on EC2
+            cat > .env << EOF
+            DB_HOST=mysql
+            DB_USER=root
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_NAME=customerdb
+            MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }}
+            EOF
 
-            # Pull latest images from Docker Hub
+            # Pull latest Docker images (tagged :latest by CI)
             docker pull pawarakash2511/customer-api:latest
             docker pull pawarakash2511/customer-ui:latest
 
-            # Restart services with new images
+            # Restart stack with new images
             docker compose down
             docker compose up -d
 
-            echo "Deployment complete — $(date)"
+            echo "--- Waiting 20s for services to initialize ---"
+            sleep 20
+
+            # Health check with retries
+            echo "--- Running health check ---"
+            RETRIES=5
+            for i in $(seq 1 $RETRIES); do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost || echo "000")
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "Health check PASSED (HTTP $HTTP_STATUS)"
+                break
+              fi
+              echo "Attempt $i/$RETRIES: HTTP $HTTP_STATUS — retrying in 10s..."
+              if [ "$i" = "$RETRIES" ]; then
+                echo "Health check FAILED after $RETRIES attempts"
+                docker compose logs --tail=50
+                exit 1
+              fi
+              sleep 10
+            done
+
+            # Print the live web URL
+            PUBLIC_IP=$(curl -s --max-time 3 http://169.254.169.254/latest/meta-data/public-ipv4 || echo "${{ secrets.EC2_HOST }}")
+            echo ""
+            echo "============================================"
+            echo "  Deployment complete — $(date)"
+            echo "  Web URL: http://${PUBLIC_IP}"
+            echo "============================================"

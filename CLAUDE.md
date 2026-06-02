@@ -98,10 +98,12 @@ Frontend works on desktop, Android, and iPhone. Key techniques in `frontend/styl
 
 **CD** — SSHs into AWS EC2, pulls latest images, runs `docker compose down && docker compose up -d`.
 
-**GitHub Secrets to configure:**
+**GitHub Secrets to configure (6 total):**
 - `DOCKER_USERNAME` = `pawarakash2511`
 - `DOCKER_PASSWORD` = Docker Hub access token
 - `EC2_HOST` = EC2 public IP
 - `EC2_USER` = `ec2-user`
 - `EC2_SSH_KEY` = PEM private key content
-- `ENV_FILE` = full contents of `.env` file (CD writes this to EC2 on every deploy)
+- `DB_PASSWORD` = MySQL root password (CD auto-generates `.env` on EC2 from this — no manual file needed)
+
+**Image tagging:** CI pushes two tags per build — `:<git-sha>` (immutable, traceable) and `:latest` (CD always pulls this).
