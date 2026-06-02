@@ -58,7 +58,7 @@ jobs:
             echo "--- Running health check ---"
             RETRIES=5
             for i in $(seq 1 $RETRIES); do
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost || echo "000")
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8082 || echo "000")
               if [ "$HTTP_STATUS" = "200" ]; then
                 echo "Health check PASSED (HTTP $HTTP_STATUS)"
                 break
@@ -77,5 +77,5 @@ jobs:
             echo ""
             echo "============================================"
             echo "  Deployment complete — $(date)"
-            echo "  Web URL: http://${PUBLIC_IP}"
+            echo "  Web URL: http://${PUBLIC_IP}:8082"
             echo "============================================"
