@@ -48,8 +48,8 @@ jobs:
             docker pull pawarakash2511/customer-ui:latest
 
             # Restart stack with new images
-            docker compose down
-            docker compose up -d
+            docker-compose down
+            docker-compose up -d
 
             echo "--- Waiting 20s for services to initialize ---"
             sleep 20
@@ -66,7 +66,7 @@ jobs:
               echo "Attempt $i/$RETRIES: HTTP $HTTP_STATUS — retrying in 10s..."
               if [ "$i" = "$RETRIES" ]; then
                 echo "Health check FAILED after $RETRIES attempts"
-                docker compose logs --tail=50
+                docker-compose logs --tail=50
                 exit 1
               fi
               sleep 10
