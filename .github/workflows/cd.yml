@@ -21,10 +21,18 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-            cd /home/ec2-user/Data-genter-collecter
 
-            # Pull latest code (picks up docker-compose.yml changes)
-            git pull origin main
+            REPO_DIR="/home/ec2-user/Data-genter-collecter"
+            REPO_URL="https://github.com/${{ github.repository }}.git"
+
+            # Clone on first deploy; pull on all subsequent deploys
+            if [ -d "$REPO_DIR/.git" ]; then
+              cd "$REPO_DIR"
+              git pull origin main
+            else
+              git clone "$REPO_URL" "$REPO_DIR"
+              cd "$REPO_DIR"
+            fi
 
             # Auto-generate .env from secrets — no manual file creation needed on EC2
             cat > .env << EOF
