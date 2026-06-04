@@ -24,3 +24,16 @@ def insert_customer(data):
     cursor.close()
     conn.close()
     return row_id
+
+
+def get_all_customers():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers ORDER BY submitted_at DESC")
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    for row in rows:
+        if row.get("submitted_at"):
+            row["submitted_at"] = row["submitted_at"].strftime("%Y-%m-%d %H:%M:%S")
+    return rows

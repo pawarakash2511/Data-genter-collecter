@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1976d2" />
+  <title>Admin Panel — Customer Data</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+    body {
+      background-color: #e3f2fd;
+      color: #000;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    /* ── LOGIN SECTION ───────────────────────────── */
+    #loginSection {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: calc(20px + env(safe-area-inset-top))
+               calc(16px + env(safe-area-inset-right))
+               calc(20px + env(safe-area-inset-bottom))
+               calc(16px + env(safe-area-inset-left));
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .login-card h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      color: #1565c0;
+      margin-bottom: 6px;
+    }
+
+    .login-card .subtitle {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 28px;
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      font-size: 16px;
+      padding: 12px;
+      border: 1px solid #90caf9;
+      border-radius: 4px;
+      background: #f9f9f9;
+      color: #000;
+      min-height: 44px;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1976d2;
+      background: #fff;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      min-height: 48px;
+      background-color: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 8px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary:hover, .btn-primary:active { background-color: #1565c0; }
+
+    #loginMsg {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    #loginMsg.error  { display: block; background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+    #loginMsg.info   { display: block; background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #1976d2;
+      text-decoration: none;
+      font-size: 0.88rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    /* ── DASHBOARD SECTION ───────────────────────── */
+    #dashboardSection { display: none; }
+
+    .dash-header {
+      background: #1976d2;
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: calc(16px + env(safe-area-inset-top));
+      padding-left: calc(24px + env(safe-area-inset-left));
+      padding-right: calc(24px + env(safe-area-inset-right));
+    }
+
+    .dash-header h1 { font-size: 1.2rem; }
+    .dash-header .header-right { display: flex; gap: 10px; align-items: center; }
+
+    .btn-outline {
+      padding: 8px 16px;
+      border: 2px solid #fff;
+      background: transparent;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 0.2s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.15); }
+
+    .dash-body {
+      padding: 24px;
+      padding-left: calc(24px + env(safe-area-inset-left));
+      padding-right: calc(24px + env(safe-area-inset-right));
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .dash-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .record-count {
+      font-size: 0.95rem;
+      color: #444;
+      font-weight: bold;
+    }
+
+    .table-wrapper {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 640px;
+    }
+
+    thead th {
+      background: #1565c0;
+      color: #fff;
+      padding: 12px 14px;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+    }
+
+    tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #e3f2fd;
+      color: #222;
+    }
+
+    tbody tr.even  { background: #fff; }
+    tbody tr.odd   { background: #f0f7ff; }
+    tbody tr:hover { background: #dceeff; }
+
+    .loading, .empty, .error-cell {
+      text-align: center;
+      padding: 32px;
+      color: #888;
+      font-style: italic;
+    }
+    .error-cell { color: #c62828; }
+
+    .dash-back {
+      display: inline-block;
+      margin-top: 20px;
+      color: #1976d2;
+      text-decoration: none;
+      font-size: 0.88rem;
+    }
+    .dash-back:hover { text-decoration: underline; }
+
+    @media (max-width: 520px) {
+      .login-card { padding: 28px 16px; }
+      .dash-header h1 { font-size: 1rem; }
+      .dash-body { padding: 16px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SECTION -->
+  <div id="loginSection">
+    <div class="login-card">
+      <h1>Admin Panel</h1>
+      <p class="subtitle">Customer Data Collection — RONEN</p>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter username"
+                 autocomplete="username" autocorrect="off" autocapitalize="off" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password"
+                 autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn-primary">Login</button>
+        <div id="loginMsg" role="alert"></div>
+      </form>
+
+      <a href="index.html" class="back-link">← Back to Customer Form</a>
+    </div>
+  </div>
+
+  <!-- DASHBOARD SECTION -->
+  <div id="dashboardSection">
+    <div class="dash-header">
+      <h1>Admin Panel — Customer Records</h1>
+      <div class="header-right">
+        <button class="btn-outline" id="refreshBtn">Refresh</button>
+        <button class="btn-outline" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <div class="dash-meta">
+        <span class="record-count" id="recordCount">Loading...</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Customer ID</th>
+              <th>Name</th>
+              <th>Gender</th>
+              <th>Age (stored)</th>
+              <th>Some Number (stored)</th>
+              <th>Submitted At (UTC)</th>
+            </tr>
+          </thead>
+          <tbody id="customerTableBody">
+            <tr><td colspan="7" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <a href="index.html" class="dash-back">← Back to Customer Form</a>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
