@@ -53,6 +53,7 @@ Browser → frontend/:8082 (Nginx) → /api/* proxied → backend/:5000 (Flask) 
 - **`frontend/script.js`** — multiplies `some_number × 2` before POSTing to `/api/customers` (relative URL — works on localhost and EC2)
 - **`frontend/admin.html`** — admin panel: login form + customer data dashboard (single page, two states managed by JS)
 - **`frontend/admin.js`** — handles admin login, JWT storage in `sessionStorage`, data fetching, table rendering
+- **`frontend/index.html`** header — flexbox row: title (left) + Admin Panel button (right); do NOT use `position:absolute` — it caused overlap with the title
 - **`backend/app.py`** — increments `age + 1`, generates `submitted_at`, calls `insert_customer()`; also exposes `POST /api/admin/login` and `GET /api/admin/customers` (JWT-protected)
 - **`backend/database.py`** — MySQL connection via env vars (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`)
 - **`backend/models.py`** — `insert_customer(data)` executes the INSERT; `get_all_customers()` fetches all rows for admin panel

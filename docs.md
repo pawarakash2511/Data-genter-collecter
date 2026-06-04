@@ -328,7 +328,7 @@ A password-protected dashboard for viewing all submitted customer records.
 
 ### How to access
 
-1. Open the main app — click **"Admin Panel"** button in the top-right corner of the form
+1. Open the main app — click **"Admin Panel"** button in the top-right of the form header (same row as the title)
 2. Or navigate directly to `/admin.html`
 
 | Environment | URL |
