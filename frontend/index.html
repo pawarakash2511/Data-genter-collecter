@@ -20,27 +20,26 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container" style="position:relative;">
-    <a href="admin.html" style="
-      position:absolute;
-      top:16px;
-      right:16px;
-      padding:7px 14px;
-      background:#fff;
-      color:#1976d2;
-      border:2px solid #1976d2;
-      border-radius:4px;
-      text-decoration:none;
-      font-size:0.8rem;
-      font-weight:bold;
-      touch-action:manipulation;
-      white-space:nowrap;
-    "
-    onmouseover="this.style.background='#1976d2';this.style.color='#fff';"
-    onmouseout="this.style.background='#fff';this.style.color='#1976d2';"
-    >Admin Panel</a>
-
-    <h1>Customer Data Collection RONEN</h1>
+  <div class="container">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:28px;">
+      <h1 style="margin-bottom:0; text-align:left; font-size:1.3rem;">Customer Data Collection RONEN</h1>
+      <a href="admin.html" style="
+        flex-shrink:0;
+        padding:7px 14px;
+        background:#fff;
+        color:#1976d2;
+        border:2px solid #1976d2;
+        border-radius:4px;
+        text-decoration:none;
+        font-size:0.8rem;
+        font-weight:bold;
+        touch-action:manipulation;
+        white-space:nowrap;
+      "
+      onmouseover="this.style.background='#1976d2';this.style.color='#fff';"
+      onmouseout="this.style.background='#fff';this.style.color='#1976d2';"
+      >Admin Panel</a>
+    </div>
 
     <form id="customerForm" novalidate>
       <div class="form-group">
