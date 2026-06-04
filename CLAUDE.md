@@ -51,10 +51,21 @@ Browser → frontend/:8082 (Nginx) → /api/* proxied → backend/:5000 (Flask) 
 
 - **`frontend/nginx.conf`** — proxies `/api/` to `http://backend:5000/api/` internally; backend port 5000 is NOT exposed to the host
 - **`frontend/script.js`** — multiplies `some_number × 2` before POSTing to `/api/customers` (relative URL — works on localhost and EC2)
-- **`backend/app.py`** — increments `age + 1`, generates `submitted_at`, calls `insert_customer()`
+- **`frontend/admin.html`** — admin panel: login form + customer data dashboard (single page, two states managed by JS)
+- **`frontend/admin.js`** — handles admin login, JWT storage in `sessionStorage`, data fetching, table rendering
+- **`backend/app.py`** — increments `age + 1`, generates `submitted_at`, calls `insert_customer()`; also exposes `POST /api/admin/login` and `GET /api/admin/customers` (JWT-protected)
 - **`backend/database.py`** — MySQL connection via env vars (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`)
-- **`backend/models.py`** — `insert_customer(data)` executes the INSERT
+- **`backend/models.py`** — `insert_customer(data)` executes the INSERT; `get_all_customers()` fetches all rows for admin panel
 - **`database/init.sql`** — auto-runs on first MySQL container start; creates `customerdb` and `customers` table
+
+## Admin Panel
+
+- **URL:** `/admin.html` (same port as main app)
+- **Access:** "Admin Panel" button in top-right corner of the customer form
+- **Auth:** JWT — 8-hour session stored in `sessionStorage`; credentials from `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars (defaults hardcoded in `app.py`)
+- **Features:** Table of all submitted customer records (newest first), Refresh button, Logout
+- **New dependency:** `PyJWT==2.8.0` in `backend/requirements.txt`
+- **New env vars (optional override):** `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `JWT_SECRET`
 
 ## Environment
 

@@ -17,9 +17,10 @@ A full-stack web application that collects customer information through a web fo
 7. [Docker & Docker Compose Installation](#docker--docker-compose-installation)
 8. [CI/CD Pipeline](#cicd-pipeline)
 9. [GitHub Secrets Configuration](#github-secrets-configuration)
-10. [API Reference](#api-reference)
-11. [Database Commands](#database-commands)
-12. [Troubleshooting](#troubleshooting)
+10. [Admin Panel](#admin-panel)
+11. [API Reference](#api-reference)
+12. [Database Commands](#database-commands)
+13. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -82,17 +83,19 @@ Key design decisions:
 Data-genter-collecter/
 │
 ├── frontend/
-│   ├── index.html          # Customer form UI
+│   ├── index.html          # Customer form UI (Admin Panel button top-right)
 │   ├── style.css           # Responsive styles (desktop + Android + iPhone)
 │   ├── script.js           # Form submit logic + some_number×2 business logic
+│   ├── admin.html          # Admin panel — login + customer data dashboard
+│   ├── admin.js            # Admin panel JS — JWT auth, data fetch, table render
 │   ├── nginx.conf          # Nginx config — serves static files + proxies /api/
 │   └── Dockerfile          # nginx:alpine image
 │
 ├── backend/
-│   ├── app.py              # Flask app — POST /api/customers endpoint
+│   ├── app.py              # Flask app — customer + admin API endpoints
 │   ├── database.py         # MySQL connection using env vars
-│   ├── models.py           # insert_customer() — executes INSERT
-│   ├── requirements.txt    # Python dependencies
+│   ├── models.py           # insert_customer() + get_all_customers()
+│   ├── requirements.txt    # Python dependencies (incl. PyJWT)
 │   ├── Dockerfile          # python:3.11-slim image
 │   └── tests/
 │       ├── __init__.py
@@ -113,7 +116,8 @@ Data-genter-collecter/
 ├── SPEC.md                 # Full project specification
 ├── CLAUDE.md               # Claude Code guidance
 ├── README.md               # Quick start guide
-└── docs.md                 # This file
+├── docs.md                 # This file
+└── AWS_native_deployment.md  # Guide to migrate from EC2 to ECR+ECS+RDS
 ```
 
 ---
@@ -318,6 +322,52 @@ Open your `.pem` file in Notepad → copy everything including `-----BEGIN RSA P
 
 ---
 
+## Admin Panel
+
+A password-protected dashboard for viewing all submitted customer records.
+
+### How to access
+
+1. Open the main app — click **"Admin Panel"** button in the top-right corner of the form
+2. Or navigate directly to `/admin.html`
+
+| Environment | URL |
+|---|---|
+| Local | `http://localhost:8082/admin.html` |
+| EC2 | `http://<EC2-PUBLIC-IP>:8082/admin.html` |
+
+### Login
+
+Enter admin credentials on the login screen. On success, a JWT token (8-hour expiry) is stored in `sessionStorage` and the dashboard loads automatically.
+
+> Credentials are set via `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables. Default values are configured in `backend/app.py`.
+
+### Dashboard features
+
+| Feature | Description |
+|---|---|
+| Customer records table | Shows all rows from the `customers` table, newest first |
+| Columns | #, Customer ID, Name, Gender, Age (stored), Some Number (stored), Submitted At (UTC) |
+| Refresh | Reloads data from the database without logging out |
+| Logout | Clears the JWT token from `sessionStorage` and returns to login screen |
+| Session expiry | If the 8-hour token expires, any data request automatically redirects to login |
+
+### Security
+
+- JWT signed with `HS256` — token is verified on every API call
+- Token stored in `sessionStorage` — cleared automatically when the browser tab closes
+- All data in the table is HTML-escaped to prevent XSS
+- Backend credentials overridable via env vars: `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `JWT_SECRET`
+
+### New backend endpoints
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/admin/login` | None | Validates credentials, returns JWT token |
+| `GET` | `/api/admin/customers` | Bearer JWT | Returns all customer records as JSON |
+
+---
+
 ## API Reference
 
 ### POST /api/customers
@@ -364,6 +414,74 @@ Stores a customer record.
 - Empty strings are rejected
 - `age` must be a valid number (min 0)
 - `gender` must be one of: Male, Female, Other
+
+---
+
+### POST /api/admin/login
+
+Authenticates the admin and returns a JWT token.
+
+**Request:**
+```json
+{
+  "username": "AkashPawar",
+  "password": "Akash34567"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "status": "success",
+  "token": "<JWT token>"
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "status": "error",
+  "message": "Invalid username or password"
+}
+```
+
+---
+
+### GET /api/admin/customers
+
+Returns all customer records. Requires a valid JWT token in the `Authorization` header.
+
+**Request header:**
+```
+Authorization: Bearer <token>
+```
+
+**Success Response (200):**
+```json
+{
+  "status": "success",
+  "count": 3,
+  "data": [
+    {
+      "id": 3,
+      "customer_id": "CUST003",
+      "customer_name": "Jane Smith",
+      "gender": "Female",
+      "age": 31,
+      "some_number": 20,
+      "submitted_at": "2026-06-04 10:23:45"
+    }
+  ]
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "status": "error",
+  "message": "Token required"
+}
+```
 
 ---
 

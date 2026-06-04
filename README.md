@@ -20,6 +20,17 @@ docker-compose up --build
 # Open http://localhost:8082
 ```
 
+## Admin Panel
+
+Click the **Admin Panel** button (top-right corner of the form) to access the admin dashboard.
+
+| URL | |
+|---|---|
+| Local | `http://localhost:8082/admin.html` |
+| EC2 | `http://<EC2-PUBLIC-IP>:8082/admin.html` |
+
+Login with admin credentials, then view all submitted customer records in a table. Session expires after 8 hours. Protected by JWT — no access without valid login.
+
 ## Run Tests
 
 ```bash
@@ -50,4 +61,5 @@ docker exec -it mysql mysql -u root -pYOUR_PASSWORD customerdb -e "SELECT * FROM
 
 ```
 http://<EC2-PUBLIC-IP>:8082
+http://<EC2-PUBLIC-IP>:8082/admin.html  ← Admin Panel
 ```
